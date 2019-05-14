@@ -4,47 +4,79 @@ const app = express();
 const port = 3000;
 const hbs = require("hbs");
 
-const publicFolder = path.join(__dirname,'../public');
-const viewsPath = path.join(__dirname,'../templates/views');
-const partialsPath = path.join(__dirname,'../templates/partials');
+const forecast = require("../utils/forecast");
+const geocode = require("../utils/geocode");
 
-app.set('view engine','hbs');
+const publicFolder = path.join(__dirname, '../public');
+const viewsPath = path.join(__dirname, '../templates/views');
+const partialsPath = path.join(__dirname, '../templates/partials');
+
+app.set('view engine', 'hbs');
 app.set('views', viewsPath);
 
 hbs.registerPartials(partialsPath);
 
 app.use(express.static(publicFolder));
 
-app.get('',(req, res) => {
-    res.render('index',{
+app.get('', (req, res) => {
+    res.render('index', {
         title: 'Weather',
         name: "Shane O'Moore"
     });
 });
 
-app.get('/about',(req, res) => {
-    res.render('about',{
+app.get('/about', (req, res) => {
+    res.render('about', {
         title: 'About',
         name: "Shane O'Moore"
     });
 });
 
-app.get('/help',(req, res) => {
-    res.render('help',{
+app.get('/help', (req, res) => {
+    res.render('help', {
         title: 'Help',
         message: 'Some random example message.',
     });
 });
 
 app.get("/weather", (req, res) => {
+    if (!req.query.address) {
+        return res.send({
+            error: 'You must provide an address'
+        });
+    }
+
+    geocode(req.query.address, (error, data) => {
+        if (error) {
+            return res.send({
+                error: error
+            });
+        }
+        const { lat, lng } = data;
+        forecast(lat, lng, (error, data) => {
+            if (error) {
+                return res.send({
+                    error: error
+                });
+            }
+            res.send(data);
+        });
+    });
+});
+
+app.get("/products", (req, res) => {
+    if (!req.query.search) {
+        return res.send({
+            error: 'You must provide a search term'
+        });
+    }
     res.send({
-        location: "Sligo",
-        forecast: "It's pissing rain"
+        products: []
     });
 });
 
 app.get("/help/*", (req, res) => {
-    res.render('help',{
+    res.render('help', {
         title: 'Help',
         message: 'Article not found',
         name: "Shane O'Moore"
@@ -52,7 +84,7 @@ app.get("/help/*", (req, res) => {
 });
 
 app.get("*", (req, res) => {
-    res.render('error',{
+    res.render('error', {
         title: 'Error',
         message: '404 Page Not Found',
         name: "Shane O'Moore"
@@ -61,4 +93,5 @@ app.get("*", (req, res) => {
 
 app.listen(port, () => {
     console.log('Server is running on port 3000...')
+    console.log('http://localhost:3000/')
 });
