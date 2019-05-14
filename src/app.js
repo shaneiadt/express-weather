@@ -36,6 +36,7 @@ app.get('/help', (req, res) => {
     res.render('help', {
         title: 'Help',
         message: 'Some random example message.',
+        name: "Shane O'Moore"
     });
 });
 
@@ -93,5 +94,5 @@ app.get("*", (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}...`);
-    console.log('if running dev http://localhost:3000/');
+    if(port === 3000) console.log('if running dev http://localhost:3000/');
 });
