@@ -59,7 +59,7 @@ app.get("/weather", (req, res) => {
                     error: error
                 });
             }
-            res.send(data);
+            res.send({ ...data, location: req.query.address });
         });
     });
 });
