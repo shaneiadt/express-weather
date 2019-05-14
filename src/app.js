@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const hbs = require("hbs");
 
 const forecast = require("../utils/forecast");
@@ -92,6 +92,6 @@ app.get("*", (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log('Server is running on port 3000...')
-    console.log('http://localhost:3000/')
+    console.log(`Server is running on port ${port}...`);
+    console.log('if running dev http://localhost:3000/');
 });
